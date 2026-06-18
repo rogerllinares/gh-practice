@@ -1,0 +1,25 @@
+name: Release on tag
+
+# Se dispara cuando se empuja un tag que empiece por "v" (v1.0.0, v0.2.0, ...)
+on:
+  push:
+    tags:
+      - 'v*'
+
+# El job necesita permiso de escritura para poder crear el release
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # historia completa para generar las notas
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}   # token automático del runner
+        run: gh release create "${GITHUB_REF_NAME}" --title "${GITHUB_REF_NAME}" --generate-notes
